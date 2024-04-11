@@ -6,13 +6,15 @@ import {
   Row,
   Col
 } from 'react-bootstrap';
-
-import { getMe, deleteBook } from '../utils/API';
+import { useQuery } from '@apollo/client'
+import { GET_USER } from '../utils/Queries'
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
+import { useAPIContext } from '../utils/API';
 
 const SavedBooks = () => {
   const [userData, setUserData] = useState({});
+  const { deleteBook } = useAPIContext();
 
   // use this to determine if `useEffect()` hook needs to run again
   const userDataLength = Object.keys(userData).length;
@@ -26,13 +28,13 @@ const SavedBooks = () => {
           return false;
         }
 
-        const response = await getMe(token);
+        const { loading, data, error } = useQuery(GET_USER)
 
-        if (!response.ok) {
-          throw new Error('something went wrong!');
+        if (!data) {
+          throw new Error(error);
         }
 
-        const user = await response.json();
+        const user = data
         setUserData(user);
       } catch (err) {
         console.error(err);
