@@ -2,6 +2,7 @@ const typeDefs = `
 type Book {
   _id: ID!
   bookId: ID!
+  title: String!
 }
 
 type User {
@@ -29,7 +30,6 @@ type Mutation {
 
 input BookInput {
   bookId: ID!
-  # Define other book input fields as needed
 }
 
 `;
