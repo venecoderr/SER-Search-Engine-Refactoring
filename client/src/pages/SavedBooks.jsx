@@ -11,38 +11,13 @@ import { GET_USER } from '../utils/Queries'
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 import { useAPIContext } from '../utils/API';
+import auth from '../utils/auth';
 
 const SavedBooks = () => {
+  const user = auth.getProfile()
   const [userData, setUserData] = useState({});
   const { deleteBook } = useAPIContext();
-
-  // use this to determine if `useEffect()` hook needs to run again
-  const userDataLength = Object.keys(userData).length;
-
-  useEffect(() => {
-    const getUserData = async () => {
-      try {
-        const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-        if (!token) {
-          return false;
-        }
-
-        const { loading, data, error } = useQuery(GET_USER)
-
-        if (!data) {
-          throw new Error(error);
-        }
-
-        const user = data
-        setUserData(user);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    getUserData();
-  }, [userDataLength]);
+  const { loading, data, error } = useQuery(GET_USER)
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
