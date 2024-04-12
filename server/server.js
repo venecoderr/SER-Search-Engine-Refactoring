@@ -4,6 +4,7 @@ const db = require('./config/connection');
 const { authMiddleware } = require('./utils/auth');
 const { typeDefs, resolvers } = require('./schemas');
 const cors = require('cors');
+const path = require('path')
 
 const app = express();
 const PORT = process.env.PORT || 3001;

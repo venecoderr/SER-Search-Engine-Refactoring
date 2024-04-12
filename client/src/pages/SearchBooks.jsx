@@ -11,6 +11,7 @@ import {
 import Auth from '../utils/auth';
 import { useAPIContext } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
+import auth from '../utils/auth';
 
 const SearchBooks = () => {
   // create state for holding returned google api data
@@ -22,7 +23,7 @@ const SearchBooks = () => {
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
   const { saveBook, searchGoogleBooks } = useAPIContext()
-
+  const user = auth.getProfile()
 
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
   // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
@@ -64,33 +65,30 @@ const SearchBooks = () => {
 
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId) => {
-    // find the book in `searchedBooks` state by the matching id
+    // Find the book in `searchedBooks` state by the matching id
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
-
-    // get token
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-    if (!token) {
-      return false;
-    }
-
+  
     try {
       const response = await saveBook({
         variables: {
-          book: bookToSave.bookId
-        }
+          bookId: bookToSave.bookId,
+          title: bookToSave.title,
+          description: bookToSave.description,
+          userId: user.data._id,
+        },
       });
-
-      if (!response) {
-        throw new Error('something went wrong!');
+  
+      if (response?.data?.saveBook) {
+        // If book successfully saves to user's account, save book id to state
+        setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+      } else {
+        throw new Error('Failed to save book');
       }
-
-      // if book successfully saves to user's account, save book id to state
-      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
       console.error(err);
     }
   };
+  ;
 
   return (
     <>
