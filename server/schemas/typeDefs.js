@@ -9,7 +9,7 @@ type User {
   _id: ID!
   username: String!
   email: String!
-  savedBooks: [Book!]!
+  savedBooks: [Book]
 }
 
 type AuthData {

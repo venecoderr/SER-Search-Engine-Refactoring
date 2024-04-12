@@ -15,36 +15,38 @@ import auth from '../utils/auth';
 
 const SavedBooks = () => {
   const user = auth.getProfile()
-  const [userData, setUserData] = useState({});
-  const { deleteBook } = useAPIContext();
-  const { loading, data, error } = useQuery(GET_USER)
+  const { loading, data, error } = useQuery(GET_USER, {
+    variables: {
+      id: user.data._id
+    }
+  })
+  
+  console.log(data)
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
-  const handleDeleteBook = async (bookId) => {
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
+  // const handleDeleteBook = async (bookId) => {
 
-    if (!token) {
-      return false;
-    }
+  //   try {
+  //     const response = await deleteBook({
+  //       variables: {
+  //         bookId: bookId
+  //       }
+  //     });
 
-    try {
-      const response = await deleteBook(bookId, token);
+  //     if (!response) {
+  //       throw new Error('something went wrong!');
+  //     }
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      const updatedUser = await response.json();
-      setUserData(updatedUser);
-      // upon success, remove book's id from localStorage
-      removeBookId(bookId);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  //     setuser(updatedUser);
+  //     // upon success, remove book's id from localStorage
+  //     removeBookId(bookId);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
   // if data isn't here yet, say so
-  if (!userDataLength) {
+  if (loading) {
     return <h2>LOADING...</h2>;
   }
 
@@ -57,12 +59,12 @@ const SavedBooks = () => {
       </div>
       <Container>
         <h2 className='pt-5'>
-          {userData.savedBooks.length
-            ? `Viewing ${userData.savedBooks.length} saved ${userData.savedBooks.length === 1 ? 'book' : 'books'}:`
-            : 'You have no saved books!'}
+          {/* {data.savedBooks.length
+            ? `Viewing ${data.savedBooks.length} saved ${data.savedBooks.length === 1 ? 'book' : 'books'}:`
+            : 'You have no saved books!'} */}
         </h2>
         <Row>
-          {userData.savedBooks.map((book) => {
+          {/* {data.savedBooks.map((book) => {
             return (
               <Col md="4">
                 <Card key={book.bookId} border='dark'>
@@ -78,7 +80,7 @@ const SavedBooks = () => {
                 </Card>
               </Col>
             );
-          })}
+          })} */}
         </Row>
       </Container>
     </>
