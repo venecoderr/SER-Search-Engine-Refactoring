@@ -21,8 +21,7 @@ module.exports = {
     }
   
     if (!token) {
-      console.log('No token found');
-      return res.status(400).json({ message: 'You have no token!' });
+      return next()
     }
   
     // verify token and get user data out of it

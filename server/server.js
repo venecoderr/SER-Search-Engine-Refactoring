@@ -7,13 +7,12 @@ const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-app.use(cors()); 
 
 async function startApolloServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    // context: authMiddleware
+    context: ({ req }) => ({ req }) // Pass the request object to the context
   });
 
   await server.start();
@@ -25,8 +24,12 @@ async function startApolloServer() {
   });
 }
 
+app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+// Add the middleware to handle authentication
+app.use(authMiddleware);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/dist')));
@@ -36,4 +39,3 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 startApolloServer();
-
