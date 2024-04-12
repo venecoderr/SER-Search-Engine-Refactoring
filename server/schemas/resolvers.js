@@ -29,17 +29,35 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
-    async saveBook(_, { book }, { user }) {
-      const updatedUser = await User.findOneAndUpdate(
-        { _id: user._id },
-        { $addToSet: { savedBooks: book } },
-        { new: true, runValidators: true }
-      );
-      return updatedUser;
+    async saveBook (_, { bookId, title, description, userId }) {
+      try {
+        // Find the user by userId
+        const user = await User.findById(userId);
+        if (!user) {
+          throw new Error('User not found');
+        }
+
+        // Check if the book is already saved
+        const existingBookIndex = user.savedBooks.findIndex(book => book.bookId === bookId);
+        if (existingBookIndex !== -1) {
+          throw new Error('Book already saved');
+        }
+
+        // Add the new book to the user's savedBooks array
+        user.savedBooks.push({ bookId, title, description });
+
+        // Save the user with the new book
+        await user.save();
+
+        // Return the updated user
+        return user;
+      } catch (error) {
+        throw new Error(`Failed to save book: ${error.message}`);
+      }
     },
-    async deleteBook(_, { bookId }, { user }) {
+    async deleteBook(_, { bookId },  userId  ) {
       const updatedUser = await User.findOneAndUpdate(
-        { _id: user._id },
+        { _id: userId },
         { $pull: { savedBooks: { bookId: bookId } } },
         { new: true }
       );
