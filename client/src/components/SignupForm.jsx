@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-
-import { createUser } from '../utils/API';
+import { useAPIContext } from '../utils/API';
 import Auth from '../utils/auth';
 
 const SignupForm = () => {
@@ -11,6 +10,8 @@ const SignupForm = () => {
   const [validated] = useState(false);
   // set state for alert
   const [showAlert, setShowAlert] = useState(false);
+
+  const { createUser, createUserError } = useAPIContext();
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -28,13 +29,19 @@ const SignupForm = () => {
     }
 
     try {
-      const response = await createUser(userFormData);
+      const response = await createUser({
+        variables: { 
+          username: userFormData.username, 
+          email: userFormData.email, 
+          password: userFormData.password 
+        }
+      });
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
+      if (!response) {
+        throw new Error('something went wrong!', createUserError);
       }
 
-      const { token, user } = await response.json();
+      const { token, user } = response.data.createUser
       console.log(user);
       Auth.login(token);
     } catch (err) {

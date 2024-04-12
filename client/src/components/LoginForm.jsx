@@ -1,14 +1,16 @@
 // see SignupForm.js for comments
 import { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-
-import { loginUser } from '../utils/API';
+import { useAPIContext } from '../utils/API';
 import Auth from '../utils/auth';
 
 const LoginForm = () => {
   const [userFormData, setUserFormData] = useState({ email: '', password: '' });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+
+  const { loginUser } = useAPIContext();
+
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -26,13 +28,18 @@ const LoginForm = () => {
     }
 
     try {
-      const response = await loginUser(userFormData);
+      const response = await loginUser({
+        variables: {
+          usernameOrEmail: userFormData.email, 
+          password: userFormData.password
+        }
+      });
 
-      if (!response.ok) {
+      if (!response) {
         throw new Error('something went wrong!');
       }
 
-      const { token, user } = await response.json();
+      const { token, user } = response.data.loginUser
       console.log(user);
       Auth.login(token);
     } catch (err) {
