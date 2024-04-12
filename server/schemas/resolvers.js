@@ -55,7 +55,7 @@ const resolvers = {
         throw new Error(`Failed to save book: ${error.message}`);
       }
     },
-    async deleteBook(_, { bookId }, { userId } ) {
+    async deleteBook(_, { bookId },  userId  ) {
       const updatedUser = await User.findOneAndUpdate(
         { _id: userId },
         { $pull: { savedBooks: { bookId: bookId } } },
