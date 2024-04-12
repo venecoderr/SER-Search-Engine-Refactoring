@@ -9,7 +9,7 @@ type User {
   _id: ID!
   username: String!
   email: String!
-  savedBooks: [Book]
+  savedBooks: [Book!]!
 }
 
 type AuthData {
@@ -25,7 +25,7 @@ type Mutation {
   createUser(username: String!, email: String!, password: String!): AuthData
   loginUser(usernameOrEmail: String!, password: String!): AuthData
   saveBook(bookId: ID!, title: String!, description: String!, userId: ID!): User
-  deleteBook(bookId: ID!): User
+  deleteBook(bookId: ID!, userId: ID!): User
 }
 
 `;

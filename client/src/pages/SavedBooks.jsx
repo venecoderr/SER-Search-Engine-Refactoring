@@ -15,35 +15,39 @@ import auth from '../utils/auth';
 
 const SavedBooks = () => {
   const user = auth.getProfile()
+  const { deleteBook } = useAPIContext()
   const { loading, data, error } = useQuery(GET_USER, {
     variables: {
       id: user.data._id
     }
   })
-  
-  console.log(data)
-
+   console.log(data)
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
-  // const handleDeleteBook = async (bookId) => {
+  const handleDeleteBook = async (bookId) => {
+    const token = Auth.loggedIn() ? Auth.getToken() : null;
 
-  //   try {
-  //     const response = await deleteBook({
-  //       variables: {
-  //         bookId: bookId
-  //       }
-  //     });
+    if (!token) {
+      return false;
+    }
 
-  //     if (!response) {
-  //       throw new Error('something went wrong!');
-  //     }
+    try {
+      const response = await deleteBook({
+        variables: {
+          bookId: bookId,
+          userId: user.data._id
+        }
+      });
 
-  //     setuser(updatedUser);
-  //     // upon success, remove book's id from localStorage
-  //     removeBookId(bookId);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
+      if (!response) {
+        throw new Error('something went wrong!');
+      }
+
+      // upon success, remove book's id from localStorage
+      removeBookId(bookId);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   // if data isn't here yet, say so
   if (loading) {
@@ -52,35 +56,35 @@ const SavedBooks = () => {
 
   return (
     <>
-      <div fluid className="text-light bg-dark p-5">
+      <div fluid="true" className="text-light bg-dark p-5">
         <Container>
           <h1>Viewing saved books!</h1>
         </Container>
       </div>
       <Container>
         <h2 className='pt-5'>
-          {/* {data.savedBooks.length
-            ? `Viewing ${data.savedBooks.length} saved ${data.savedBooks.length === 1 ? 'book' : 'books'}:`
-            : 'You have no saved books!'} */}
+          {data.getUser.savedBooks.length
+            ? `Viewing ${data.getUser.savedBooks.length} saved ${data.getUser.savedBooks.length === 1 ? 'book' : 'books'}:`
+            : 'You have no saved books!'}
         </h2>
         <Row>
-          {/* {data.savedBooks.map((book) => {
+          {data.getUser.savedBooks.map((book) => {
             return (
-              <Col md="4">
-                <Card key={book.bookId} border='dark'>
+              <Col key={book._id} md="4">
+                <Card border='dark'>
                   {book.image ? <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' /> : null}
                   <Card.Body>
                     <Card.Title>{book.title}</Card.Title>
                     <p className='small'>Authors: {book.authors}</p>
                     <Card.Text>{book.description}</Card.Text>
-                    <Button className='btn-block btn-danger' onClick={() => handleDeleteBook(book.bookId)}>
+                    <Button className='btn-block btn-danger' onClick={() => handleDeleteBook(book._id)}>
                       Delete this Book!
                     </Button>
                   </Card.Body>
                 </Card>
               </Col>
             );
-          })} */}
+          })}
         </Row>
       </Container>
     </>

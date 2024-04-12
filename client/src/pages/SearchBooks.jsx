@@ -23,13 +23,18 @@ const SearchBooks = () => {
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
   const { saveBook, searchGoogleBooks } = useAPIContext()
-  const user = auth.getProfile()
+  const [user, setUser] = useState({})
 
-  // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
-  // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
+  useEffect(() => {
+    if(auth.loggedIn()){
+      const currentUser = auth.getProfile()
+      setUser(currentUser)
+    }
+  }, [])
+
   useEffect(() => {
     return () => saveBookIds(savedBookIds);
-  });
+  },);
 
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
